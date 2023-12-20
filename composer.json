@@ -1,14 +1,11 @@
 {
-    "name": "seablast/dist",
-    "description": "Distribution of Seablast for PHP - a seed application",
-    "type": "project",
+    "name": "seablast/brief-api-client",
+    "description": "Very simple JSON RESTful API client",
+    "type": "library",
     "require": {
-        "php": "^7.2|^8.2",
-        "robmorgan/phinx": "^0.10.6|^0.12.3",
-        "seablast/seablast": "dev-mvc"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^4|^5|^6|^7|^8|^9|^10"
+        "php": "^5.3 || ^7.0",
+        "ext-curl" : "*",
+        "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "license": "MIT",
     "authors": [
@@ -19,8 +16,8 @@
     ],
     "support": {
         "email": "rejthar@stanislavrejthar.com",
-        "issues": "https://github.com/WorkOfStan/seablast-dist/issues",
-        "source": "https://github.com/WorkOfStan/seablast-dist"
+        "issues": "https://github.com/WorkOfStan/seablast-brief-api-client/issues",
+        "source": "https://github.com/WorkOfStan/seablast-brief-api-client"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -29,12 +26,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Seablast\\Distribution\\Models\\": ["models/"]
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Seablast\\Distribution\\Test\\": ["Test/"]
+            "Seablast\\BriefApiClient\\": ["src/"]
         }
     }
 }
