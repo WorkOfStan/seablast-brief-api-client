@@ -18,7 +18,7 @@ class BriefApiClientTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         error_reporting(E_ALL); // incl E_NOTICE
-        $apiUrl = 'https://raw.githubusercontent.com/WorkOfStan/seablast-brief-api-client/main/Test/test.json';
+        $apiUrl = 'https://raw.githubusercontent.com/WorkOfStan/seablast-brief-api-client/develop/Test/test.json';
         $this->object = new BriefApiClient($apiUrl);
     }
 
@@ -35,7 +35,7 @@ class BriefApiClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Seablast\BriefApiClient\BriefApiClient::getArrayArray
-     * TODO test not just reading the response, but actually sending one
+     * TODO create service, that would actually reply
      *
      * @return void
      */

@@ -150,7 +150,8 @@ class BriefApiClient
                 $this->logger->error("json decode failed for " . substr($response, 0, 100)
                     . " that resulted from " . substr($json, 0, 100));
             } else {
-                throw new \Exception("json decode failed for " . substr($response, 0, 100)
+                throw new \Exception("json decode of " . $this->apiUrl
+                    . " failed for " . substr($response, 0, 100)
                     . " that resulted from " . substr($json, 0, 100));
             }
         }
