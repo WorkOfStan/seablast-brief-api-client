@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Security` in case of vulnerabilities
 
 ## [1.0] - YYYY-MM-DD
-- latest update of the Backyard Brief API client created within LIB to work for PHP/5.3 - PHP/7.4 (Todo from-to) adapted to exist separately
+- latest update of the Backyard Brief API client created within LIB to work for PHP/5.3 - PHP/7.4 (2017-06-05 - 2022-02-10) adapted to exist separately
 
 [Unreleased]: https://github.com/WorkOfStan/seablast-brief-api-client/compare/v0.1...HEAD
 [1.0]: https://github.com/WorkOfStan/seablast-brief-api-client/releases/tag/v1.0

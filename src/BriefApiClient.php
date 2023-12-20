@@ -8,35 +8,24 @@ use Psr\Log\LoggerInterface;
  * Very simple JSON RESTful API client
  * It just sends (by HTTP POST) JSON and returns what is to be returned with few optional decorators and error logging.
  *
- * @todo Probably should be refactored using backyard json and http
- *
- * @author rejth
+ * @author Stanislav Rejthar
  */
 class BriefApiClient
 {
-    /**
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var ?\Psr\Log\LoggerInterface */
     protected $logger;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     private $apiUrl;
 
-    /**
-     *
-     * @var string or null
-     */
+    /** @var ?string */
     private $appLogFolder;
 
     /**
      *
      * @param string $apiUrl
-     * @param mixed $appLogFolder OPTIONAL string without trailing / or if null => the applogs will not be saved at all
-     * @param \Psr\Log\LoggerInterface $logger OPTIONAL but really recommended
+     * @param ?string $appLogFolder OPTIONAL string without trailing / or if null => the applogs will not be created
+     * @param \Psr\Log\LoggerInterface $logger OPTIONAL but really recommended - throws \Exception otherwise
      */
     public function __construct($apiUrl, $appLogFolder = null, LoggerInterface $logger = null)
     {
@@ -62,17 +51,18 @@ class BriefApiClient
      *
      * @param string $json
      * @param string $httpVerb POST default, or PUT/DELETE/GET
-     * @return mixed <b>TRUE</b> on success or <b>FALSE</b> on failure. However, if the <b>CURLOPT_RETURNTRANSFER</b>
-     * option is set, it will return
-     * the result on success, <b>FALSE</b> on failure.
-     *
-     * TODO: use BackyardHttp/getData incl. logging instead of another code inside sendJsonLoad method
+     * @return bool|string <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * However, if the <b>CURLOPT_RETURNTRANSFER</b>
+     * option is set, it will return the result on success, <b>FALSE</b> on failure.
      */
     public function sendJsonLoad($json, $httpVerb = 'POST')
     {
         $communicationId = $this->getCommunicationId();
         $this->logCommunication($json, $httpVerb, $communicationId);
         $ch = curl_init($this->apiUrl);
+        if ($ch === false) {
+            throw new \Exception('Curl failed to init');
+        }
         curl_setopt_array($ch, array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => $json, //json_encode($postData)
@@ -108,16 +98,21 @@ class BriefApiClient
                 ));
                 break;
             default:
-                $this->logger->error("Unknown verb {$httpVerb}");
+                if (!is_null($this->logger)) {
+                    $this->logger->error("Unknown verb {$httpVerb}");
+                }
                 return false;
         }
         $result = curl_exec($ch);
         if ($result) {
-            $this->logCommunication($result, 'resp', $communicationId);
-        } elseif (!is_null($this->logger)) {
-            $this->logger->error("Curl failed with (" . curl_errno($ch) . ") " . curl_error($ch));
+            $this->logCommunication((string) $result, 'resp', $communicationId);
+            return $result;
         }
-        return $result;
+        if (!is_null($this->logger)) {
+            $this->logger->error("Curl failed with (" . curl_errno($ch) . ") " . curl_error($ch));
+            return false;
+        }
+        throw new \Exception("Curl failed with (" . curl_errno($ch) . ") " . curl_error($ch));
     }
 
     /**
@@ -148,11 +143,19 @@ class BriefApiClient
      */
     public function getJsonArray($json)
     {
-        $response = $this->sendJsonLoad($json);
+        $response = (string) $this->sendJsonLoad($json);
         $result = json_decode($response, true);
-        if (!$result && !is_null($this->logger)) {
-            $this->logger->error("json decode failed for " . substr($response, 0, 100)
-                . " that resulted from " . substr($json, 0, 100));
+        if (!$result) {
+            if (!is_null($this->logger)) {
+                $this->logger->error("json decode failed for " . substr($response, 0, 100)
+                    . " that resulted from " . substr($json, 0, 100));
+            } else {
+                throw new \Exception("json decode failed for " . substr($response, 0, 100)
+                    . " that resulted from " . substr($json, 0, 100));
+            }
+        }
+        if (!is_array($result)) {
+            throw new \Exception('Set json_decode to associative.');
         }
         return $result;
     }
@@ -165,6 +168,10 @@ class BriefApiClient
      */
     public function getArrayArray(array $arr)
     {
-        return $this->getJsonArray(json_encode($arr));
+        $encoded = json_encode($arr);
+        if ($encoded === false) {
+            throw new \Exception('Argument MUST be an array.');
+        }
+        return $this->getJsonArray($encoded);
     }
 }
